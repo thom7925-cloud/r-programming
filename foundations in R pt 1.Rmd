@@ -418,48 +418,50 @@ After that, we need to use the library command to load the package
 
 ```{r}
 #install.packages("tidyverse")
+library(tidyverse)
 ```
 
 We can use filter and select to subset data with pipes.
 
 We can use `filter()` to pick a subset of rows:
+**Use command, shift, M to create pipe**
 
 ```{r}
-
+gearFive<- mtcars %>% filter(gear==5) 
 ```
 
 We can use `select()` to pick a subset of columns:
 
 ```{r}
-
+mtcars %>% select(mpg, hp)
 ```
 
 
 ```{r}
-
+mtcars %>% filter(gear==5) %>% select(mpg, hp)
 ```
 
 #### Learning Outcome 4 Practice: 
 
 1. Load the ChickWeight dataset.
 ```{r}
-
+data("ChickWeight")
 ```
 
 2.  Create a subset of data that contains information for Chick 8
 
 ```{r}
-
+chickEight<- ChickWeight %>% filter(Chick==8)
 ```
 
 3.  Create a subset of data for Diet 2 only.
 ```{r}
-
+dietTwo<- ChickWeight %>% filter(Diet==2)
 ```
 
 4.  Create a subset of data for all chicks weighing less than 100 gm.
 ```{r}
-
+under100gm<- ChickWeight %>% filter(weight<100)
 ```
 
 ### Learning Outcome 5: Describe your data effectively
