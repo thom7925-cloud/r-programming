@@ -88,19 +88,22 @@ penguins %>% select(billLengthMm, billDepthMm, billInfo)
 1. Change all of the column names in mtcars to capital letters
 ```{r}
 data(mtcars)
-tolower(colnames(mtcars))
+colnames(mtcars)<- toupper(colnames(mtcars))
 ```
 2. Change the name of the 9th column to reflect the values in the am column description
 ```{r}
 colnames(mtcars)[9]<- "transmission"
-
 ```
 
 3. Change the 4th column name to all lowercase letters 
 ```{r}
-tolower(colnames(mtcars)[4])
+colnames(mtcars)[4]<- "hp"
+tolower(colnames(mtcars)[4]) #not saving
 ```
 
+```{r}
+colnames(mtcars) <- tolower(colnames(mtcars))
+```
 
 ## Learning Outcome 2: Explain different classes of variables and how to change the class
 
@@ -119,37 +122,48 @@ We talked about this a little bit last week, but there are different classes (ty
 
 You can check the class of your data using `class()`
 ```{r}
-
+class(mtcars$transmission)
 ```
 
 If you want to change the class of your variable, you can assign `as.Preferredclass(dataframe$column)` to the column name
 
 ```{r}
 "is.classname"
+is.factor(mtcars$transmission)
 
 "as.classname"
-#make a new column 
+# make a new column 
+mtcars$transmission<- as.factor(mtcars$transmission)
+mtcars$transmission
 
+mtcars$transmission<- factor(mtcars$transmission)
+# going from factor to numeric can cause issues
 ```
 **DOUBLE CHECK YOUR DATA**
 ```{r}
+mtcars$transmission2<- as.numeric(mtcars$transmission)
+mtcars$transmission2
 
+mtcars %>% select(transmission, transmission2) #compare before saving!!
 ```
 
 ### Learning Outcome 2 Practice:
 1. Check the class of the horsepower column (hp) 
 ```{r}
-
+class(mtcars$hp)
 ```
 
 2. Change the class of horsepower to a factor
 ```{r}
-
+mtcars$hp<- as.factor(mtcars$hp)
+is.factor(mtcars$hp)
 ```
 
 3. Look at summaries of horsepower as a factor and as a number. What do you notice? 
 ```{r}
-
+summary(mtcars$hp) 
+mtcars$hp<- as.numeric(mtcars$hp)
+summary(mtcars$hp)
 ```
 
 
