@@ -164,7 +164,7 @@ is.factor(mtcars$hp)
 summary(mtcars$hp) 
 mtcars$hp<- as.numeric(mtcars$hp)
 summary(mtcars$hp)
-#summaries look different for factor and numeric
+#summaries look different for factor (qualitative stats) and numeric (quantitative stats)
 ```
 
 
