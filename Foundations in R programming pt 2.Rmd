@@ -183,47 +183,53 @@ You can make a simple function that adds two to a set of numbers
 Before we make the function, we'll make a vector of numbers (1-10) as our input
 
 ```{r}
-
+oneToTen<- 1:10
 ```
 
 then, we'll name our function addTwo and give it one argument or input
 
 ```{r}
-
+addTwo<- function(number){
+ number + 2
+}
 ```
 if we run this correctly, it should show up in the environment (top right). 
 
 Then, we can use our function to add two to our vector:
 
 ```{r}
-
+addTwo(7)
+addTwo(oneToTen)
 ```
 
 One thing to note- anything you make in a function **stays in the function.** If you want to save it to a dataframe, you treat your new function just like any other R function (i.e. you need to assign the output to a column or variable)
 
 ```{r}
 "dataframe$column <- function"
-
+onePlusTwo<- addTwo(oneToTen)
 ```
 
 ## Practice:
 function to multiply by 7
 ```{r}
-
+multiplySeven<- function(number){number * 7}
 ```
 test it out
 ```{r}
-
+multiplySeven(4)
 ```
 
+Functions w/ characters
 **my favorite is**
 `paste()`
 ```{r}
-
+myFavorite<- function(thing){
+  paste("My favorite food is", thing)
+}
 ```
 test
 ```{r}
-
+myFavorite("dumplings")
 ```
 
 ### Multiple argument functions
@@ -231,29 +237,46 @@ test
 We can make functions with more than one argument. For instance we could multiply all of the numbers in our original vector by a second vector 10-1
 
 ```{r}
-
+tenToOne<- 10:1
+tenToOne
 ```
+
+```{r}
+multipleBy<- function(number1, number2){
+  number1*number2
+}
+
+multipleBy(oneToTen, tenToOne)
+
+numberDat<- cbind.data.frame(oneToTen, tenToOne)
+numberDat$multiply<- multipleBy(oneToTen, tenToOne)
+```
+
 
 ### Learning Outcome 3 Practice
 
 1. Make a function that divides numbers by 100. 
 ```{r}
-
+divHundred<- function(number){
+  number/100
+}
 ```
 
 2. Test your function on the mtcars mpg column.
 ```{r}
-
+divHundred(mtcars$mpg)
 ```
 
 3. Make a function that finds the mean of a column and divides it by the standard deviation of another column.
 ```{r}
-
+meanDivSD<- function(colOne, colTwo){
+  mean(colOne)/sd(colTwo)
+}
 ```
 
 4. Test it on the mpg column and hp column. 
 ```{r}
-
+meanDivSD(mtcars$mpg, mtcars$hp)
 ```
 
 ## Learning Outcome 4: Create your own for loop
@@ -264,12 +287,17 @@ Let's say we wanted to create a column in the chickweight dataset that indicated
 
 We'd have to make a new column
 ```{r}
-
-
+data("ChickWeight")
+#beginning will be days 0,2,4
+#end will be days 18,20,21
+ChickWeight$beginEnd<- NA
 ```
 and then fill in that new column by indexing the days column, which has 12 different days. 
 ```{r}
-
+ChickWeight$beginEnd[ChickWeight$Time== 0]<- "beginning"
+ChickWeight$beginEnd[ChickWeight$Time== 2]<- "beginning"
+ChickWeight$beginEnd[ChickWeight$Time== 4]<- "beginning"
+ChickWeight$beginEnd[ChickWeight$Time>16]<- "end"
 ```
 
 We could use a **for loop** though to go through each row of the data set and fill out the new column (beginning or end) based on the days in the Time column.
@@ -288,14 +316,22 @@ think we want to do
 }
 
 ```{r}
-
+for(i in 1:nrow(ChickWeight)){
+  ChickWeight$beginEnd[i]<- ChickWeight$Time[i]>10
+}
 ```
 
 ### Practice for Learning Outcome 4: 
 
 1. Create a for loop that will multiply each number in a vector by 4. Test it with a vector containing the numbers 10:100. 
 ```{r}
-
+number<- NA
+for(i in 1:length(tenToHundred)){
+  number[i]<- tenToHundred[i]*4
+}
+for(i in 1:length(tenToHundred)){
+  print(tenToHundred[i]*4)
+}
 ```
 
 2. Create a new column in the mtcars data set that indicated whether a car has good mileage (over 25 mpg) or bad mileage (25 mpg or fewer).  
