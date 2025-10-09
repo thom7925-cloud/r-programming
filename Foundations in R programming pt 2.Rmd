@@ -325,6 +325,7 @@ for(i in 1:nrow(ChickWeight)){
 
 1. Create a for loop that will multiply each number in a vector by 4. Test it with a vector containing the numbers 10:100. 
 ```{r}
+tenToHundred<- 10:100
 number<- NA
 for(i in 1:length(tenToHundred)){
   number[i]<- tenToHundred[i]*4
@@ -401,3 +402,23 @@ for(){
 mtcars$transmission<- NA
 mtcars$transmission<- ifelse(mtcars$am==0, "automatic", "manual")
 ```
+
+###bonus for loop
+Tejiri = Dream
+Sawyer = Biscoe
+Rachael = Torgerson
+```{r}
+penguins$studentFavorite<- NA
+for(i in 1:nrow(penguins)) {
+  if(penguins$island[i]=="Dream"){
+      penguins$studentFavorite[i]<- "Tejiri"
+  } 
+  if(penguins$island[i]=="Biscoe"){
+      penguins$studentFavorite[i]<- "Saywer"
+  } 
+  if(penguins$island[i]=="Torgersen"){
+      penguins$studentFavorite[i]<- "Rachael"
+  } 
+}
+```
+
