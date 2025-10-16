@@ -80,7 +80,7 @@ ggplot makes graphs in layers. I'll try to demonstrate:
 
 Here is an "empty graph" 
 ```{r}
-
+ggplot()
 ```
 You'll notice that the Plot window opened on my version of R and contains a gray background. This is a default "empty graph."
 
@@ -90,7 +90,7 @@ The next step is to include a dataset and to include an argument called aestheti
 
 In our case, we'll use the diamonds dataset again and see what happens when we include an x variable. 
 ```{r}
-
+ggplot(diamonds, aes(price))
 ```
 
 You'll notice that now we have an x axis, labeled x with values on it. 
@@ -101,13 +101,13 @@ This `ggplot()` section is the base of our graph. We add additional parts using 
 We'll start with histograms because we only need one variable to make one. To do this, we can add `+geom_histogram()` to our code above. 
 
 ```{r}
-
+ggplot(diamonds, aes(price))+ geom_histogram()
 ```
 
 **Changing the background**
 I really don't like the gray background (personal preference). So the first customization we'll do is remove the background using a themes argument.
 ```{r}
-
+ggplot(diamonds, aes(price))+ geom_histogram()+ theme_classic()
 ```
 It can be used with any graph. 
 
@@ -116,7 +116,7 @@ There are two additional arguments we can use to change the colors; color and fi
 
 Note: color and fill go in the histogram layer
 ```{r}
-
+ggplot(diamonds, aes(price))+ geom_histogram(color= "green", fill= "bisque")+ theme_classic()
 ```
 **Note**You can also put the color and fill arguments in the `aes()` section. As your graphs get more complicated, you will notice that placement matters and will result in slightly different graphs. We're not going to go that far today though.
 
@@ -125,21 +125,21 @@ Note: color and fill go in the histogram layer
 #### Histogram Practice: 
 1. Create a histogram of the bill length variable. 
 ```{r}
-
+ggplot(penguins, aes(bill_len))+ geom_histogram(bins=20)
 ```
 2. Include a theme to change the appearance of your graph.
 ```{r}
-
+ggplot(penguins, aes(bill_len))+ geom_histogram(bins=20)+ theme_classic()
 ```
 
 3. Create a histogram with orange bars and purple lines. 
 ```{r}
-
+ggplot(penguins, aes(bill_len))+ geom_histogram(bins= 20, color= "purple", fill= "orange")+ theme_classic()
 ```
 
 4. **Bonus** Create a histogram with the worst color combination you can think of. 
 ```{r}
-
+ggplot(penguins, aes(bill_len))+ geom_histogram(bins= 20, color= "darkorange4", fill= "yellow4")+ theme_classic()
 ```
 
 **Bar graph** 
@@ -148,40 +148,57 @@ Next, we'll talk about how to make a bar graph. We can do this the same way we m
 We'll practice on the "clarity" column. (I'll use another theme so you can see the differences)
 
 ```{r}
-
+ggplot(diamonds, aes(clarity))+ geom_bar(fill= "lightgreen")+ theme_bw()
 ```
 
 **Changing the x and y label axes** 
 You'll notice that our y axis is "count" and our x axis is "clarity". These are not particularly informative. We can change these using xlab and ylab. 
 ```{r}
-
+ggplot(diamonds, aes(clarity))+ 
+  geom_bar(color= "black", fill= "lightgreen") + 
+  theme_classic() + 
+  xlab("Clarity of Diamond") + 
+  lab("Frequency") + 
+  ggtitle("Graph of Diamond Clarity")
 ```
 
 you can also choose to use labs, with x, y, and title
 ```{r}
-
+ggplot(diamonds, aes(clarity))+ 
+  geom_bar(color= "black", fill= "lightgreen") + 
+  theme_classic() + 
+  labs(title= "Graph of Diamond Clarity", x= "Diamond Clarity", y= "Frequency")
 ```
 
 Note - \n- starts a new line 
 ```{r}
-
+ggplot(diamonds, aes(clarity))+ 
+  geom_bar(color= "black", fill= "lightgreen") + 
+  theme_classic() + 
+  labs(title= "Graph of \nDiamond Clarity", x= "\nDiamond Clarity", y= "Frequency")
 ```
 
 **Using means in bar graphs**
 Sometimes, we don't just want the count of a category to make a bar graph. For instance, we may want to use a mean. We can do this by using the summary data frame we made before. 
 
 ```{r}
-
+ggplot(priceByColor, aes(color, price))+ geom_bar(stat="identity")
 ```
 
 **standard errors**
 Using this dataset also allows us to include standard error bars or confidence intervals in our plots. We do this by adding a layer called `geom_errorbar(aes(ymin, ymax))`. 
 ```{r}
-
+ggplot(priceByColor, aes(color, price))+ 
+  geom_bar(stat="identity", fill="aquamarine")+
+  geom_errorbar(aes(ymin = price - se, ymax = price + se))+
+  theme_classic()
 ```
 
 ```{r}
-
+ggplot(priceByColor, aes(color, price))+ 
+  geom_bar(stat="identity", fill="aquamarine", alpha= .4)+ 
+  geom_errorbar(aes(ymin = price - se, ymax = price + se, width = .5))+
+  theme_classic() ##alpha 0-1 changes transparency
 ```
 
 Things I included:
