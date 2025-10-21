@@ -158,7 +158,7 @@ ggplot(diamonds, aes(clarity))+
   geom_bar(color= "black", fill= "lightgreen") + 
   theme_classic() + 
   xlab("Clarity of Diamond") + 
-  lab("Frequency") + 
+  ylab("Frequency") + 
   ggtitle("Graph of Diamond Clarity")
 ```
 
@@ -209,11 +209,20 @@ Things I included:
 
 **adding lines** (hline/vline)
 ```{r}
-
+ggplot(priceByColor, aes(color, price))+ 
+  geom_bar(stat="identity", fill="aquamarine", alpha= .4)+ 
+  geom_errorbar(aes(ymin = price - se, ymax = price + se, width = .5))+
+  theme_classic() +
+  geom_hline(yintercept = mean(diamonds$price), linewidth = 1, linetype= "dashed", color= "purple")
+  
 ```
 
 ```{r}
-
+ggplot(priceByColor, aes(color, price))+ 
+  geom_bar(stat="identity", fill="aquamarine", alpha= .4)+ 
+  geom_errorbar(aes(ymin = price - se, ymax = price + se, width = .5))+
+  theme_classic() +
+  geom_vline(xintercept= "G", color= "green")
 ```
 
 Things I changed: 
@@ -226,46 +235,68 @@ Things I changed:
 
 ### Practice: 
 1. Create a bar graph for the species column. 
+```{r}
+ggplot(penguins, aes(species))+
+  geom_bar(color= "aquamarine", fill= "darkblue")+
+  theme_classic()
+```
+
 2. Change the x and y labels to something that is more informative. 
+```{r}
+ggplot(penguins, aes(species))+
+  geom_bar(color= "aquamarine", fill= "darkblue")+
+  theme_classic()+
+  labs(title= "Penguins", x= "Species", y= "Frequency")
+```
 
 ### Adding a second variable to a bar graph: 
 ```{r}
-
+ggplot(diamonds, aes(color, fill= cut))+ 
+  geom_bar()+
+  theme_classic()
 ```
 
 ```{r}
+ggplot(diamonds, aes(color, fill= cut))+ 
+  geom_bar(position=position_dodge())+
+  theme_classic()   #categorical variables
+```
 
+```{r}
+data(mtcars)
+ggplot(mtcars, aes(cyl, fill=as.factor(mpg)))+
+  geom_bar()
 ```
 
 
 **Scatter plot**
 We can make scatter plots using the argument `geom_point()`. We'll make a graph of carat by price. 
 ```{r}
-
+ggplot(diamonds, aes(carat, price))+ geom_point()
 ```
 
 ```{r}
-
+ggplot(diamonds, aes(carat, price))+ geom_point(color= "red", fill= "lightblue") #fill doesn't work for scatterplots
 ```
 
 ```{r}
-
+ggplot(diamonds, aes(carat, price))+ geom_point(color= "lightblue", size= 2, shape= 4)
 ```
 
 #jitter()
 ```{r}
-
+ggplot(mtcars, aes(cyl, gear))+ geom_jitter() #only add to other graphs for a sense of variability
 ```
 
 ### Practice
 - make a scatter plot of bill length and bill depth. 
 ```{r}
-
+ggplot(penguins, aes(bill_len, bill_dep))+ geom_point()
 ```
 
 - modify the graph to include at least 2of the style elements we talked about
 ```{r}
-
+ggplot(penguins, aes(bill_len, bill_dep))+ geom_point(color= "lightpink", size= 2, shape= 10)
 ```
 
 **Note:**In this case, `geom_point()` is the best option to make our scatter plot. If you work with small datasets, the points may be overlapping and make it look like you have less data. In these cases, you can use `geom_jitter()`, which will offset the dots slightly and allow you to see each participant.  
@@ -273,35 +304,34 @@ We can make scatter plots using the argument `geom_point()`. We'll make a graph 
 **Inserting a regression line**
 We can include a regression line into our graph using `geom_smooth()`.
 ```{r}
-
+ggplot(diamonds, aes(carat, price))+geom_point()+geom_smooth(method = "lm", size=1, color="orange", linetype= "dashed")
 ```
 We can customize whether the regression line has a confidence interval surrounding it. You may be asking yourself **what confidence interval**. Carat and price are very highly correlated. let's use an mtcars example to see how we can change it. 
 w/ 95% confidence interval shaded
 ```{r}
-
+ggplot(mtcars, aes(mpg, hp))+ geom_point()+ geom_smooth(method= "lm", se= FALSE) #se=FALSE to remove conf interval shading
 ```
-**Changing scatterplots**
-you can change the outline of a dot using "color" 
-```{r}
 
+```{r}
+ggplot(diamonds, aes(carat, price, color=cut))+ geom_point()
 ```
 
 ####Practice: 
 1. Create a scatter plot of the body mass and flipper length variables. 
 ```{r}
-
+ggplot(penguins, aes(body_mass, flipper_len))+ geom_point()
 ```
 2. Change the color of the points to your favorite color. 
 ```{r}
-
+ggplot(penguins, aes(body_mass, flipper_len))+ geom_point(color= "darkgreen")
 ```
 3. Change the shape of the points. 
 ```{r}
-
+ggplot(penguins, aes(body_mass, flipper_len))+ geom_point(color= "darkgreen", shape= 6)
 ```
 4. Add a line of best fit to your scatter plot. 
 ```{r}
-
+ggplot(penguins, aes(body_mass, flipper_len))+ geom_point(color= "darkgreen", shape= 6)+ geom_smooth(method= "lm")
 ```
 
 **Line graphs**
