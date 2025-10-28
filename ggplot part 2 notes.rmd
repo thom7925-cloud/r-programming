@@ -85,25 +85,46 @@ Facet Wrap allows us to incorporate a third variable in another way. Specificall
 
 we need to make a graph and save it 
 ```{r}
+ggplot(diamonds, aes(carat, price, color= cut))+ 
+  geom_point()+
+  geom_smooth(method= "lm", color= "black")+
+  facet_wrap(~color) ##four variables
 
-
+ggplot(diamonds, aes(color, price, colour = cut))+ 
+  geom_boxplot()+
+  facet_wrap(~cut) #three variables
 ```
 
 ### change labels on the axes
 change levels beforehand
 ```{r}
+levels(penguins$species)<- c("Adelie Penguin", "Chinstrap Penguin", "Gentoo Penguin")
 
+ggplot(penguins, aes(bill_length_mm, bill_depth_mm))+ 
+  geom_point()+ 
+  facet_wrap(~species)
 ```
 
 make a vector called labels. use `labeller=as_labeller())` in `facet_wrap()`
 ```{r}
+speciesTitle<- c("Adelie Penguin"= "Adelie", "Chinstrap Penguin"= "Chinstrap", "Gentoo Penguin"= "Gentoo") #write current name in dataset = name you want to present
 
+ggplot(penguins, aes(bill_length_mm, bill_depth_mm))+ 
+  geom_point()+ 
+  facet_wrap(~species, labeller= as_labeller(speciesTitle))
 ```
 
 ### Practice: 
 1) create a facet wrap graph to generate a scatterplot of mpg and hp based on the number of cylinders a car has
 ```{r}
-
+data(mtcars)
+library(viridis)
+cylinders<- c("4"= "Four Cylinder", "6"= "Six Cylinder", "8"= "Eight Cylinder")
+ggplot(mtcars, aes(mpg, hp))+
+  geom_point(color= "lightpink")+
+  facet_wrap(~cyl, labeller= as_labeller(cylinders))+
+  labs(title = "Miles per Gallon and Horsepower by Cylinder", x= "Miles per Gallon", y= "Horsepower")+
+  theme_bw()
 ```
 
 ### Learning Outcome 3: Explain how to export graphs
@@ -111,13 +132,13 @@ to export graphs, I use the command `ggsave()`
 Specifically, you can use the following arguments: 
 `ggsave("name of graph", width, height, units, dpi)`
 ```{r}
-
+getwd()
 ```
 I don't usually specify a path in ggsave, but make sure my r code is in the directory I'd like it to be saved in. you can check your working directory by using this code
 ```{r}
-
+ggsave("FinalMtcarsGraph.tiff", width = 10, height = 8, units = "in", dpi = 300)
 ```
 you can change your working directory using this code: 
 ```{r}
-
+setwd()
 ```
