@@ -21,7 +21,8 @@ We'll use data from a student mental health survey collected last year.
 ## Import the data
 
 ```{r}
-mentalDat <- read.csv("~/Downloads/students_mental_health_survey fall 2025.csv")
+library(readr) 
+smh <- read_csv("students_mental_health_survey fall 2025.csv")
 ```
 
 
@@ -32,22 +33,24 @@ We've gone through some of these already, but I want to make sure we're on the s
 
 ##### Mean 
 ```{r}
+mean(smh$stressLevel)
 
+mean(smh$stressLevel, na.rm = TRUE)
 ```
 ##### Median
 ```{r}
-
+median(smh$stressLevel)
 ```
 
 ##### Mode
-
 ```{r}
-
+library(modeest)
+mfv(smh$stressLevel)
 ```
 
 ##### Pipes
 ```{r}
-
+smh %>% summarize(meanStress= mean(stressLevel), medianStress = median(stressLevel), modeStress= mfv(stressLevel))
 ```
 
 
@@ -56,27 +59,38 @@ We've gone through some of these already, but I want to make sure we're on the s
 
 ##### Range
 ```{r}
-
+range(smh$stressLevel)
+5-0 #hard coding 
+range(smh$stressLevel)[2]- range(smh$stressLevel)[1] #soft coding
 ```
 
 ##### Interquartile Range
 ```{r}
-
+IQR(smh$stressLevel) #difference between 75% and 25%
 ```
 
 ##### Standard Deviation
 ```{r}
-
+sd(smh$stressLevel) #typical distance of a score to the mean and/or giving a sense of average dispersion in measured units
 ```
 
 ##### Variance
 ```{r}
+var(smh$stressLevel) #typical distance in squared units 
+```
 
+##### Pipes
+```{r}
+smh %>% summarize(stDev= sd(stressLevel), variance= var(stressLevel), InterquartileRange= IQR(stressLevel), range= range(stressLevel)[2]- range(stressLevel)[1])
 ```
 
 ##### Summary
 ```{r}
-
+summary(smh$stressLevel)
+```
+##### bringing it all together
+```{r}
+smh %>% group_by(sleepQuality) %>% summarize(meanstress= mean(stressLevel), stDev= sd(stressLevel))
 ```
 
 #### Z Score
@@ -84,34 +98,40 @@ We've gone through some of these already, but I want to make sure we're on the s
 The other thing that we'll put in this section is how to create a z score in your data. This allows us to view one score relative to others, even if they are collected from different distributions
 
 ```{r}
-
+smh$stressLevelZ<- scale(smh$stressLevel)
+smh$centeredStress<-scale(smh$stressLevel, center=TRUE, scale = FALSE) #this will give us the difference from the mean; not in standard deviation units
+#z score = scsore- mean/standard deviation
+#mean centered = score-mean
+smh %>% select(stressLevel, stressLevelZ, centeredStress)
 ```
 
 ##### Learning Outcome 1 Practice
 1) calculate the mean, median, and mode for any data in the our Dataset
 ```{r}
-
-
+#cortisol 
+mean(smh$cortisolLevel)
+median(smh$cortisolLevel)
+mfv(smh$cortisolLevel)
 ```
 
 2) what do you notice about these scores? (are they the same? different?)
-
+mostly similar
 ```{r}
-
+ggplot(smh, aes(cortisolLevel))+ geom_histogram( bins=10)
 ```
 
 3) create z scores for any data in our Dataset. Interpret what participant 3's z score means. 
 ```{r}
-
+smh$cortisolLevelZ<- scale(smh$cortisolLevel)
 ```
 
 ```{r}
-
+smh$cortisolLevelZ[smh$Participant==3]
 ```
 
  *Challenge* Graph your data and include the mean median and mode on the graph 
 ```{r}
-
+ggplot(smh, aes(cortisolLevel))+ geom_histogram() + geom_vline(xintercept = mean(smh$cortisolLevel), color="orchid", size= 1)+ theme_classic()+ geom_vline(xintercept = median(smh$cortisolLevel), size= 1, linetype="dashed", color= "orchid4")+ geom_vline(xintercept = mfv(smh$cortisolLevel), color="wheat", size= 1)
 ```
 
 ### Learning Outcome 2: Conduct common parametric analyses in R
@@ -122,28 +142,30 @@ Now that we have covered some descriptive statistics, we'll talk about parametri
 We'll practice running correlations using the dataset above. To do this, we'll look at the correlation between fishavailable and temperature
 `cor(x, y)`
 ```{r}
-
+cor(smh$stressLevel, smh$cortisolLevel)
 ```
+
+```{r}
+ggplot(smh, aes(stressLevel, cortisolLevel))+ geom_point()
+```
+
 **Note:** It's great that we can see the correlation between these two measures, but we don't have any additional information, ie information related to significance.We can use another function, `cor.test()`, to get information about significance.
 `cor.test(x,y)`
 ```{r}
-
-```
-graph
-```{r}
-
+cor.test(smh$stressLevel, smh$cortisolLevel)
 ```
 
-We can change whether we our conducting a one tailed or a two tailed test by including an additional argument "alternative." It defaults to a two tailed test, but we can specify a one tailed test in either direction ("greater" or "less"). The default is "two.sided" 
+We can change whether we our conducting a one tailed or a two tailed test by including an additional argument "alternative." It defaults to a two tailed test, but we can specify a one tailed test in either direction (`"greater"` or `"less"`). The default is `"two.sided"` 
 ```{r}
-
+cor.test(smh$stressLevel, smh$cortisolLevel, alternative = "greater")
 ```
 
 ### Extra Code about Correlation Tables 
 `cor()` can also be used to create correlation matrices, but need to create a dataframe that is just the variables you'd like to use. 
 `cor(data)`
 ```{r}
-
+smhSmall<- smh %>% select(cortisolLevel, stressLevel, creditLoad) 
+cor(smhSmall)
 ```
 for heat map of correlations see: http://www.sthda.com/english/wiki/ggplot2-quick-correlation-matrix-heatmap-r-software-and-data-visualization 
 
@@ -154,13 +176,21 @@ We can run a variety of t-tests using the same function `t.test()`.
 A one sample t test can be computed by specifying mu in the arguments. 
 `t.test(variable, mu)`
 ```{r}
-
+t.test(smh$stressLevel, mu= 2.5, alternative= "less")
 ```
 
 ##### two samples t-test
 There are two ways we can use this function when we have two variables (independent or paired). The first is to type our x and y variables in as we did in the correlation function above. 
 ```{r}
+levels(as.factor(smh$sleepQuality))
 
+goodBadSleep<- smh %>% filter(sleepQuality=="Poor" | sleepQuality == "Good")
+
+#t.test(group 1, group2)
+# formula approach
+t.test(stressLevel~ sleepQuality, data= goodBadSleep) #no equal variance assumption
+
+#t.test(group1,group2), but you can only do this when you have two groups in different columns
 ```
 You'll notice that the top of the t-test output says "Welch's Two sample t-test." This R function automatically assumes that the variances of each group are unequal. If we wanted to run a traditional paired-samples t-test, we need to include another argument. 
 
@@ -169,13 +199,19 @@ we can type them in as a formula in R. Formulas typically take the form y ~ x. T
 `t.test(dependent variable ~ indepedent variable, data= dataframe)`
 
 ```{r}
-
+t.test(stressLevel~ sleepQuality, data= goodBadSleep, var.equal=TRUE)
 ```
 If our data were dependent between observations, we'll run a paired samples t test. The code looks pretty similar to above, but we'll use an additional argument. 
 
 let's use the sleep datset as an example
 ```{r}
+data(sleep)
 
+t.test(extra~ group, data=sleep, paired=TRUE) #doesn't work on some versions 
+
+sleepWide<- pivot_wider(sleep, id_cols= "ID", values_from= "extra", names_from= "group")
+
+t.test(sleepWide$`1`, sleepWide$`2`, paired=TRUE)
 ```
 
 Finally, we some times run one tailed vs two tailed tests, just like we did with the correlations. 
@@ -183,93 +219,133 @@ Finally, we some times run one tailed vs two tailed tests, just like we did with
 ##### Correlation and T-test practice
 1. Open the mtcars dataset. Find the correlation between mpg and hp
 ```{r}
-
+data(mtcars)
+cor(mtcars$hp, mtcars$mpg)
+cor.test(mtcars$hp, mtcars$mpg)
+library(ggplot2)
+ggplot(mtcars, aes(hp, mpg))+ geom_point()+geom_smooth(method="lm")
 ```
 
 2. Conduct a significance test to determine if displacement and miles per gallon significantly correlated. 
 ```{r}
-
+ggplot(mtcars, aes(disp, mpg))+geom_point()+geom_smooth(method="lm")
+cor.test(mtcars$disp, mtcars$mpg)
 ```
 
 3. Conduct a two-tailed t-test examining whether the average mpg differs by transmission (am). 
 ```{r}
+t.test(mpg~ am, data=mtcars, var.equal=TRUE)
 
+#t.test(mtcars$mpg, mtcars$am, var.equal=TRUE); this isn't correct
+# this code would compare average mpg average label for transmission
 ```
 
 4. Conduct a one-tailed t-test examining whether the average displacement(disp) differs engine shape (vs). Specifically, test whether straight engines result in higher displacements.
 ```{r}
+t.test(disp~ vs, data=mtcars, var.equal=TRUE, alternative= "less" ) #v shape - straight engine disp
 
+ggplot(mtcars, aes(as.factor(vs), disp))+ geom_boxplot()
 ```
 
 
 #### regression
-Back to the simulated Dataset we made. The code for a linear regression is really similar (ie identical)  to what we used for t-tests.
+Back to the student mental health Dataset we made. The code for a linear regression is really similar (ie identical)  to what we used for t-tests.
 `lm(DV ~ IV, data)`
 ```{r}
+lm1<- lm(creditLoad~ stressLevel, data=smh)
 
+#predicted credit load = 22.11+ .15*stressLevel
 ```
 I tend to save my linear models because it allows me to do a few useful things:
 Just like we used   `summary()` to get a summary of our data, we can use the same function to learn more about our models
 ```{r}
+summary(lm1)
 
+ggplot(smh, aes(stressLevel, creditLoad))+ geom_point()+geom_smooth(method="lm")
+
+smh$stressLevel<- as.factor(smh$stressLevel)
+lm2<- lm(creditLoad~ stressLevel, data=smh)
+summary(lm2)
 ```
 `str()` is a function that allows us to learn about the structure of our model. We can use this to get specific pieces of information, or additional information that "underlies" our model (eg residuals and fitted values)
 ```{r}
-
+lm1$coefficients# can also index these
+lm1$residuals #error
+lm1$fitted.values #predicted values
 ```
 
 **Multiple Regression**
 We can include additional factors and interaction terms to our models: 
 
 ```{r}
-
+lm3<- lm(creditLoad~ stressLevel + depressionScore, data=smh)
+lm3
+summary(lm3)
 ```
 Using * instead of + will include both the individual predictors AND their interactions
 ```{r}
+lm4<- lm(creditLoad ~ depressionScore + anxietyScore, data=smh)
+lm4
+summary(lm4)
 
+lm5<- lm(creditLoad~ depressionScore * anxietyScore, data=smh)
+summary(lm5)
 ```
  
 The : can be used instead of + to include an interaction in your model
 ```{r}
-
+lm6<- lm(creditLoad ~ depressionScore+ anxietyScore+ depressionScore:anxietyScore, data=smh)
+summary(lm6)
 ```
 
-The class of our data and the way data are entered matter for regression models. 
+**Important:**The class of our data and the way data are entered matter for regression models. 
 
 We may also need to change the reference level for factors.
 `relevel(dat$column, ref="x")`
-
-```{r}
-
-```
 
 **Anova**
 There are several ways you can get Anova results in R. There are differences in the ways that they handle interactions, but they are used in the same way. We can use `aov()`, `anova()`, and `Anova()`
 
 ```{r}
+smh$sleepQuality<- as.factor(smh$sleepQuality)
+smh$physicalActivity<- as.factor(smh$physicalActivity)
 
+a1<- aov(creditLoad~ physicalActivity, data=smh)
+summary(a1)
+
+#aside
+summary(lm(creditLoad~physicalActivity, data=smh))
+
+lm7<- lm(creditLoad~ physicalActivity, data=smh)
+anova(lm7)
+
+library(car)
+Anova(lm7)
 ```
 
  more predictors!
 ```{r}
-
+a2<- aov(creditLoad~ physicalActivity * sleepQuality, data=smh)
+summary(a2)
 ```
  
 #### Regression and ANOVA practice
 1. Use the mtcars dataset and create a linear model that predicts mpg from cylinder (cyl) and displacement. Print the results
 
 ```{r}
-
+mtcarsLm1<- lm(mpg ~ cyl+disp, data=mtcars )
+summary(mtcarsLm1)
 ```
 
 2. Create the same model, but include an interaction term. 
 ```{r}
-
+mtcarsLm<- lm(mpg ~ cyl*disp, data=mtcars )
+summary(mtcarsLm)
 ```
 
 3. Run an ANOVA predicting hp from the transmission variable. 
 ```{r}
-
+summary(aov(hp~am, data=mtcars))
 ```
 
 ###Learning Outcome 3: Nonparametric analyses in R
@@ -278,41 +354,50 @@ Nonparametric analyses are run similarly to their parametric versions. In the in
 **biserial correlations**
 Biserial correlations involve a binary outcome and a continuous variable. To run one in R, we need the ltm package. 
 ```{r}
-
+library(ltm)
 ```
-the function is `biserial.cor(continuous, binary)`
-```{r}
+the function is `biserial.cor(continuous, binary)`. going to use it to see the relationship between sleep quality and anxietyscore
 
+```{r}
+biserial.cor(goodBadSleep$anxietyScore, goodBadSleep$sleepQuality,level = 1)
+ggplot(goodBadSleep, aes(sleepQuality,anxietyScore)) + geom_point()+ geom_smooth(method="lm")
 ```
 Mathematically, this is the same as the pearson's version. 
 ```{r}
-
+goodBadSleep$sleepNumber<- ifelse(goodBadSleep$sleepQuality=="Poor", 0, 1)
+cor(goodBadSleep$sleepNumber,goodBadSleep$anxietyScore)
 ```
 
 **spearman's rho**
-We can calculate spearman's rho and kendall's tau the same way. We just need to use the "method" argument for `cor.test()`
+We can calculate spearman's rho and kendall's tau the same way. We just need to use the "method" argument for `cor.test()`. Correlations we can run with ordinal data
 ```{r}
-
+cor.test(smh$depressionScore, smh$anxietyScore, method = "kendall")
 ```
 
 ```{r}
-
+cor.test(smh$depressionScore, smh$anxietyScore, method= "spearman")
 ```
 
 **Wilcoxon sign rank test**
 This is the nonparametric version of the t-test. It has the same arguments. We'll do one as an example. 
 `wilcox.test()`
 ```{r}
-
+wilcox.test(anxietyScore ~ sleepQuality, data= goodBadSleep)
+#wilcox.test(group1, group2)
 ```
 
 **chi squared tests** 
-compare frequencies of nominal data. You can ask questions like: does the frequency of polarbear presence differ from expected? 
+Goodness of fit test: do our data differ from expected proportions? 
+Test of independence: are our two variables related
+
+chi squared tests compare observed frequencies versus expected frequencies
 
 chisquare goodness of fit test allows us to answer this question. to do this, we're going to use the function `chisq.test()`
 
 ```{r}
+table(smh$sleepQuality)
 
+chisq.test(c(217,319,48), p= c(1/3, 1/3,1/3))
 ```
 
 **binomial tests**
@@ -320,18 +405,19 @@ We use binomial tests to determine if something happens more often than chance. 
 `binom.test(successes, totalScores, probability)`
 
 ```{r}
-
+#flipping a coin 12 times; got 6 heads 
+binom.test(6, 12, p = .5)
 ```
 
 for instance, if we have 10 true/false statements, and get 6 right. Does this differ from chance? 
 ```{r}
-
+binom.test(6, 10, p=.5)
 ```
 This is a two-tailed test, but can also do one tailed by specifying the alternative. 
 
 20 questions, 5 choices, and want to know probability of getting 14 correct
 ```{r}
-
+binom.test(14, 20, p=.2)
 ```
 
 
@@ -340,16 +426,20 @@ This is a two-tailed test, but can also do one tailed by specifying the alternat
 
 biserial correlation b/c one variable is binary and the other is continuous
 ```{r}
+ggplot(mtcars, aes(vs, hp))+geom_point()+geom_smooth(method="lm")
+biserial.cor(mtcars$hp, mtcars$vs, level = 2)
 
+cor(mtcars$hp, mtcars$vs)
 ```
 
 2. Run a wilcoxon sign rank test to determine if cylinder and gears have different means. 
 ```{r}
-
+wilcox.test(mtcars$cyl, mtcars$gears)
 ```
 
 3. Run a binomial test to determine if the number of cars with manual transmission differs from chance. (hint: use the ? feature to learn more about the dataset.)
 
 ```{r}
-
+table(mtcars$am)
+binom.test(13, 32, p=.5)
 ```
