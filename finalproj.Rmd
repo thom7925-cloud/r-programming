@@ -1,0 +1,69 @@
+---
+title: "final project"
+output: html_document
+date: "2025-11-24"
+---
+
+## Data
+
+```{r}
+turnoverDat <- read.csv("~/Downloads/turnover-data-set - turnover-data-set.csv")
+##Cleaned by removing participants who were still employed, removed "etc." from profession, translated a couple words
+```
+
+## Does the average length of tenure differ across professions?
+
+```{r}
+r1<- aov(experience..months.~ profession, data= turnoverDat)
+summary(r1) ##Findings are significant, suggesting that average length differs across professions
+TukeyHSD(r1) ##Posthoc tests revealed accounting had significantly higher mean scores compared to other professions. This suggests that there is less turnover in the accounting profession.
+```
+
+```{r}
+library(tidyverse)
+library(viridis)
+ggplot(turnoverDat, aes(x=profession, y=experience..months., fill=profession))+
+  geom_boxplot()+
+  scale_fill_viridis(discrete = TRUE, option = "plasma")+ theme_bw()+
+  labs(title = "Average Length of Tenure Across Professions", x = "Profession", y = "Average Length of Tenure")
+##Graph shows large difference between accounting boxplot and other profession plots.
+```
+
+## Does the average length of tenure differ across various modes of transportation?
+
+```{r}
+r2 <- aov(experience..months.~ transportation, data = turnoverDat)
+summary(r2) ##Findings are not significant, suggesting that average length does not differ across various modes of transportation.
+```
+
+```{r}
+library(tidyverse)
+ggplot(turnoverDat, aes(x=transportation, y=experience..months., fill = transportation)) +
+geom_boxplot()+
+scale_fill_viridis(discrete = TRUE, option = "plasma")+
+  labs(title = "Average Length of Tenure Across Different Modes of Transportation", x = "Mode of Transportation", y = "Average Length of Tenure")+
+theme_bw()
+##Graph shows little difference between groups
+```
+
+
+## Does the average length of tenure differ based on gender similarity between employee and supervisor?
+
+```{r}
+turnoverDat$genderSimilarity<- ifelse(turnoverDat$gender== turnoverDat$supervisorGender, "0", "1")
+#Adding column to data, 0 is same gender, 1 is different gender
+```
+
+```{r}
+t.test(experience..months.~ genderSimilarity, data = turnoverDat, var.equal = TRUE)
+##Findings are not significant, suggesting that average length of tenure does not differ based on gender similarity
+```
+
+```{r}
+ggplot(turnoverDat, aes(x=genderSimilarity, y=experience..months., fill=genderSimilarity))+
+  geom_boxplot()+
+  scale_fill_viridis(discrete = TRUE, option = "plasma")+ theme_bw()+
+  labs(title = "Average Length of Tenure By Gender Similarity", x= "Gender Similarity (0:Same, 1:Different)", y= "Average Length of Tenure")
+##Graph shows little difference between groups
+```
+
