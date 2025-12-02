@@ -304,7 +304,7 @@ ggplot(penguins, aes(bill_len, bill_dep))+ geom_point(color= "lightpink", size= 
 **Inserting a regression line**
 We can include a regression line into our graph using `geom_smooth()`.
 ```{r}
-ggplot(diamonds, aes(carat, price))+geom_point()+geom_smooth(method = "lm", size=1, color="orange", linetype= "dashed")
+ggplot(diamonds, aes(carat, price))+geom_point()+geom_smooth(method = "lm", linewidth=1, color="orange", linetype= "dashed")
 ```
 We can customize whether the regression line has a confidence interval surrounding it. You may be asking yourself **what confidence interval**. Carat and price are very highly correlated. let's use an mtcars example to see how we can change it. 
 w/ 95% confidence interval shaded
@@ -331,55 +331,79 @@ ggplot(penguins, aes(body_mass, flipper_len))+ geom_point(color= "darkgreen", sh
 ```
 4. Add a line of best fit to your scatter plot. 
 ```{r}
-ggplot(penguins, aes(body_mass, flipper_len))+ geom_point(color= "darkgreen", shape= 6)+ geom_smooth(method= "lm")
+ggplot(penguins, aes(body_mass, flipper_len))+ geom_point(color= "darkgreen", shape= 6)+ geom_smooth(method= "lm", color= "black")
 ```
 
 **Line graphs**
 Line graphs follow a similar to scatterplots, but use the geom_line function. Color customizations follow the same rules as scatterplots. 
 include group in aes
 ```{r}
-
+data("ChickWeight")
+ggplot(ChickWeight, aes(Time, weight, group=Chick))+ geom_line()
 ```
 
 ```{r}
-
+ggplot(ChickWeight, aes(Time, weight, color=Chick))+ geom_line()
 ```
-#cyl
-```{r}
-
-```
-
 I won't talk as much about these graphs, but happy to answer questions. 
 
 **Box plots**
 I hope that the pattern is starting to make sense, but the only difference with a box plot is that you'll use `geom_boxplot()`. 
 ```{r}
-
+ggplot(diamonds, aes(price))+ geom_boxplot()
 ```
 
 ```{r}
-
+ggplot(diamonds, aes(color, price))+ geom_boxplot()
 ```
 
 ```{r twoVariableBoxplot}
-
+ggplot(diamonds, aes(color, price))+ geom_boxplot(color= "black", fill= "lightblue")
 ```
 
+```{r}
+ggplot(diamonds, aes(color, price))+ geom_boxplot()+ geom_jitter()
+ggplot(mtcars, aes(as.factor(cyl), mpg))+ geom_boxplot()+ geom_jitter()
+```
+
+### Violin Plot
+```{r}
+ggplot(diamonds, aes(color,price))+ geom_violin()
+```
 
 ### Practice: 
 1. Create a boxplot for flipper length.
 ```{r}
-
+ggplot(penguins, aes(flipper_len))+ geom_boxplot()
 ```
 
 2. Create boxplots of flipper length for each species.
 ```{r}
-
+ggplot(penguins, aes(flipper_len, species))+ geom_boxplot()
 ```
 
 3. **Bonus** play around with fill and color. What changes about your boxplots? 
 ```{r}
+ggplot(penguins, aes(flipper_len, species))+ 
+  geom_boxplot(color= "lightpink", fill= "darkgreen")
+```
 
+###Best and Worst Graphs
+```{r}
+mentalDat <- read.csv("~/Downloads/students_mental_health_survey fall 2025.csv")
+```
+
+```{r}
+ggplot(mentalDat, aes(cortisolLevel, stressLevel))+
+  geom_point(color = "khaki4", size= 5, shape= 12)+
+   theme(panel.background = element_rect(fill= "olivedrab4"))
+```
+
+```{r}
+ggplot(mentalDat, aes(as.factor(cortisolLevel), stressLevel))+ 
+  geom_boxplot(color= "plum", fill= "navy")+ 
+  theme_classic()+
+  labs(title= "Stress by Cortisol", x= "Cortisol Level", y= "Stress Level")
 ```
 
 ## Learning Outcome 4:Incorporate third variables into graphs
@@ -388,57 +412,76 @@ There are many ways that we can include third variables.
 For histograms/bar graphs: 
 use fill = 
 ```{r}
-
+ggplot(diamonds, (aes(price, fill=color)))+ 
+  geom_histogram(bins= 15)
 ```
 
 For scatter plots: 
 color = 
 ```{r}
-
+ggplot(diamonds, aes(price, carat, color= cut))+ 
+  geom_point()
 ```
-
 Rather than having all bars/dots/lines the same color, you can have them change by using various packages and by looking up a few color codes online. 
 
 If you don't like the colors, we can specify specific ones using `scale_fill_manual()` OR using a package called R color brewer `scale_color_brewer()`  or viridis. 
 (need to specify option for color scales)
 We'll walk through these together because I think it's helpful to see what color combinations exist and how you can use them in a bar graph or a scatter plot.
 ```{r}
-
+ggplot(diamonds, aes(price, fill=color))+ 
+  geom_histogram(position= position_dodge(), bins= 12)+
+  scale_fill_manual(values = c("#D7F2BA", "#0D2818", "#BC4749", "#058C42", "#FEC196", "#044B7F", "#011627"))
 ```
 `scale_color_manual(values = #)`; 
 ```{r}
-
+ggplot(diamonds, aes(price, carat, color=cut))+ 
+  geom_point()+ 
+  scale_color_manual(values = c("#D7F2BA", "#0D2818", "#BC4749", "#058C42", "#FEC196", "#044B7F", "#011627"))
 ```
 
 R ColorBrewer
 `scale_color_brewer(palette=)`
 ```{r}
+library(RColorBrewer)
+ggplot(diamonds, aes(price, carat, color=cut))+
+  geom_point()+
+  scale_color_brewer(palette= "Set2")
 
+ggplot(diamonds, aes(price, fill=color))+ 
+  geom_histogram(position= position_dodge(), bins= 12)+
+  scale_fill_brewer(palette = "Set2")
 ```
 
 Viridis
 `scale_color_viridis()`
 ```{r}
+library(viridis)
+ggplot(diamonds, aes(price, carat, color=cut))+
+  geom_point()+ 
+  scale_color_viridis(discrete = TRUE, option = "viridis")
 
+ggplot(diamonds, aes(price, fill=color))+ 
+  geom_histogram(position= position_dodge(), bins= 12)+
+  scale_fill_viridis(discrete = TRUE, option = "plasma") ##use discrete when variable is categorical 
 ```
 
 
 ### Learning Outcome 4 Practice. 
 1. Create a graph of bill length and island
 ```{r}
-
+ggplot(penguins, aes(bill_len, fill=island))+ geom_histogram(position = position_dodge())
 ```
 
 2. In some way, include species as a third variable in this graph. 
 ```{r}
-
+ggplot(penguins, aes(island, bill_len, color = species))+ geom_point()
 ```
 
 3. Create a graph of bill length and bill depth
 ```{r}
-
+ggplot(penguins, aes(bill_len, bill_dep))+ geom_point()
 ```
 4. In some way, include species as a third variable.
 ```{r}
-
+ggplot(penguins, aes(bill_len, bill_dep, color= species))+ geom_point()
 ```
