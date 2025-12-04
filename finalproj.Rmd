@@ -4,7 +4,15 @@ output: html_document
 date: "2025-11-24"
 ---
 
-## Data
+## Cleaning Data
+
+```{r}
+messyTurnover <- read.csv("~/Downloads/turnover-data-set (1).csv")
+
+library(tidyverse)
+cleanDat<- messyTurnover %>% filter(event==1) %>% filter(profession!= "etc") 
+```
+
 
 ```{r}
 turnoverDat <- read.csv("~/Downloads/turnover-data-set - turnover-data-set.csv")
